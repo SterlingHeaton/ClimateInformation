@@ -50,23 +50,51 @@ auto MyClock::UpdateClock( String input ) -> void
 
 auto MyClock::GetDate() -> String
 {
-  String dateFormat = "%Y-%M-%D";
+  String dateFormat = "%M %D, 20%Y";
 
   dateFormat.replace( "%Y", String { ds3231Clock.getYear() } );
-  dateFormat.replace( "%M", String { ds3231Clock.getMonth( century ) < 10 ? "0" + String { ds3231Clock.getMonth( century ) } : ds3231Clock.getMonth( century ) } );
+  dateFormat.replace( "%M", GetShortMonth( ds3231Clock.getMonth( century ) - 1 ) );
   dateFormat.replace( "%D", String { ds3231Clock.getDate() < 10 ? "0" + String { ds3231Clock.getDate() } : ds3231Clock.getDate() } );
 
   return dateFormat;
 }
 
-auto MyClock::GetTime() -> String
+auto MyClock::GetTime( bool meridiemShortHand ) -> String
 {
-  String timeFormat = "%H:%M:%S %P";
+  String timeFormat = "%H:%M:%S%P";
 
   timeFormat.replace( "%H", String { ds3231Clock.getHour( h12Flag, pmFlag ) < 10 ? "0" + String { ds3231Clock.getHour( h12Flag, pmFlag ) } : ds3231Clock.getHour( h12Flag, pmFlag ) } );
   timeFormat.replace( "%M", String { ds3231Clock.getMinute() < 10 ? "0" + String { ds3231Clock.getMinute() } : ds3231Clock.getMinute() } );
   timeFormat.replace( "%S", String { ds3231Clock.getSecond() < 10 ? "0" + String { ds3231Clock.getSecond() } : ds3231Clock.getSecond() } );
-  timeFormat.replace( "%P", pmFlag ? "PM" : "AM" );
+
+  if( meridiemShortHand )
+  {
+    timeFormat.replace( "%P", pmFlag ? "p" : "a" );
+  }
+  else
+  {
+    timeFormat.replace( "%P", pmFlag ? "PM" : "AM" );
+  }
 
   return timeFormat;
+}
+
+auto MyClock::GetShortMonth( uint8_t month ) -> String
+{
+  switch( month )
+  {
+    case 0: return "Jan";
+    case 1: return "Feb";
+    case 2: return "Mar";
+    case 3: return "Apr";
+    case 4: return "May";
+    case 5: return "Jun";
+    case 6: return "Jul";
+    case 7: return "Aug";
+    case 8: return "Sep";
+    case 9: return "Oct";
+    case 10: return "Nov";
+    case 11: return "Dec";
+    default: return "ERR";
+  }
 }

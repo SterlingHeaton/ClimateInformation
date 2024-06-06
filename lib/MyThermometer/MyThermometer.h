@@ -3,8 +3,11 @@
 class MyThermometer
 {
 public:
+  MyThermometer(int pin)
+    : PIN(pin) {}
+
   auto GetTemperature() -> float;
 
 private:
-  const int PIN = 0;
+  int PIN;
 };
