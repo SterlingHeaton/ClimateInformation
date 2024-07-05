@@ -4,11 +4,16 @@
 #include <MyThermometer.h>
 
 LiquidCrystal lcd( 32, 33, 36, 37, 38, 39 );
+LiquidCrystal lcd( 32, 33, 36, 37, 38, 39, 2, POSITIVE);
 MyClock       myClock;
 MyThermometer myThermometer( 0 );
 
 unsigned long lastUpdate  = 0;
 float         temperature = 0;
+
+bool lcdDisplay = true;
+
+bool previousButtonState = false;
 
 void setup()
 {
@@ -27,11 +32,41 @@ void setup()
 
   Serial.println( "SETUP" );
 
-  analogWrite( 11, 70 );
+  // Set LCD contrast
+  analogWrite( 11, 75 );
+
+  // Set button state
+  int buttonState = digitalRead( BUTTON_PIN );
+  previousButtonState = buttonState == HIGH;
 }
 
 void loop()
 {
+  int buttonState = digitalRead( BUTTON_PIN );
+
+  bool currentButtonState = buttonState == HIGH;
+
+  if( previousButtonState != currentButtonState )
+  {
+    previousButtonState = currentButtonState;
+
+    if( currentButtonState )
+    {
+      lcdDisplay = !lcdDisplay;
+
+      if( lcdDisplay )
+      {
+        lcd.setBacklight( 1 );
+        Serial.println( "TURNED LCD ON" );
+      }
+      else
+      {
+        lcd.setBacklight( 0 );
+        Serial.println( "TURNED LCD OFF" );
+      }
+    }
+  }
+
   auto startTime = millis();
   // If we have a serial input, update real time clock to the timestamp provided.
   if( Serial.available() )
